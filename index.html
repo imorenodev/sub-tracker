@@ -53,11 +53,22 @@ button{cursor:pointer}
 /* header */
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0 8px}
 .topline{display:flex;gap:8px;align-items:center}
-.tabs{flex:1;display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
-.tab{border:0;background:transparent;border-radius:10px;padding:10px 0;font-weight:700;font-size:18px;position:relative}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;height:50px}
+body.editing .tabs{flex:1}
+.tab{border:0;background:transparent;border-radius:10px;padding:0 10px;font-weight:700;font-size:15px;position:relative}
 .tab[aria-selected="true"]{background:var(--pitch);color:#fff}
-.tab .live{position:absolute;top:8px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--led-out);display:none}
+.tab .live{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--led-out);display:none}
 .tab.running .live{display:block}
+.score{flex:1;display:flex;align-items:stretch;background:var(--board);color:var(--board-ink);border-radius:14px;height:50px;padding:4px;gap:2px;min-width:0}
+body.editing .score{display:none}
+.sc{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0}
+.sc span{font-size:12px;font-weight:700;letter-spacing:.06em;color:#a9b3ae}
+.pm{display:flex;flex-direction:column;gap:2px;align-self:stretch}
+.pm button{flex:1;width:28px;border:0;border-radius:7px;background:#ffffff1a;color:inherit;font-weight:800;font-size:16px;line-height:1;padding:0}
+.pm button:active{background:#ffffff40}
+.sc b{font-size:24px;line-height:1}
+.sc.us b{color:var(--led-in)}
+.score .dash{align-self:center;color:#a9b3ae;font-weight:700}
 .iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:14px;height:50px;padding:0 14px;font-weight:600;font-size:15px}
 
 .controls{display:flex;gap:8px;margin-top:8px;align-items:stretch}
@@ -130,6 +141,13 @@ h2{font-size:22px;margin:16px 0 8px}
 <div class="wrap">
   <header>
     <div class="topline">
+      <div class="score" id="score" aria-label="Score">
+        <div class="sc us"><span>US</span><b class="num" id="scUs">0</b>
+          <div class="pm"><button data-side="us" data-d="1" aria-label="Add a goal for us">+</button><button data-side="us" data-d="-1" aria-label="Remove a goal for us">&minus;</button></div></div>
+        <span class="dash">&ndash;</span>
+        <div class="sc opp"><div class="pm"><button data-side="opp" data-d="1" aria-label="Add a goal for opponent">+</button><button data-side="opp" data-d="-1" aria-label="Remove a goal for opponent">&minus;</button></div>
+          <b class="num" id="scOpp">0</b><span>OPP</span></div>
+      </div>
       <div class="tabs" role="tablist" id="tabs"></div>
       <button class="iconbtn" id="editBtn">Roster</button>
     </div>
@@ -182,7 +200,7 @@ const uid=()=>Math.random().toString(36).slice(2,9);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function fmt(ms){ms=Math.max(0,Math.round(ms/1000));const m=Math.floor(ms/60),s=ms%60;return m+':'+String(s).padStart(2,'0');}
 
-function freshGame(){return {times:{},lastLineup:[]};}
+function freshGame(){return {times:{},lastLineup:[],score:{us:0,opp:0}};}
 function defaultTeam(){
   return {players:Array.from({length:10},(_,i)=>({id:uid(),name:'Player '+(i+1),present:true})),
           settings:{onField:5,minStint:180,gap:90},game:freshGame()};
@@ -200,6 +218,7 @@ const present=()=>T().players.filter(p=>p.present);
 function rec(id,team){const g=(team||T()).game;if(!g.times[id])g.times[id]={total:0,startedAt:null,benchSince:null};return g.times[id];}
 function played(id,now){const r=rec(id);return r.total+(r.startedAt?now-r.startedAt:0);}
 const isOn=id=>!!rec(id).startedAt;
+const score=()=>T().game.score||(T().game.score={us:0,opp:0});
 function startP(id,now){const r=rec(id);if(!r.startedAt){r.startedAt=now;r.benchSince=null;}}
 function stopP(id,now){const r=rec(id);if(r.startedAt){r.total+=now-r.startedAt;r.startedAt=null;r.benchSince=now;}}
 
@@ -277,7 +296,10 @@ function renderTabs(){
 
 function renderList(){
   const list=$('list');
-  const pres=present(),abs=T().players.filter(p=>!p.present);
+  const abs=T().players.filter(p=>!p.present);
+  // Least recently played on top: never played, then longest on the bench, then players on the field (newest sub last).
+  const recency=p=>{const r=rec(p.id);return r.startedAt?[1,r.startedAt]:[0,r.benchSince||0];};
+  const pres=present().map(p=>[p,recency(p)]).sort((a,b)=>(a[1][0]-b[1][0])||(a[1][1]-b[1][1])).map(x=>x[0]);
   list.innerHTML=[...pres,...abs].map(p=>{
     const on=p.present&&isOn(p.id);
     return `<div class="row${on?' on':''}${p.present?'':' absent'}" data-id="${p.id}">
@@ -312,8 +334,10 @@ function tick(){
   wake(anyRunning);
 }
 
+function renderScore(){const s=score();$('scUs').textContent=s.us;$('scOpp').textContent=s.opp;}
+
 function render(){
-  renderTabs();renderList();boardSig='';tick();
+  renderTabs();renderScore();renderList();boardSig='';tick();
   $('undoBtn').disabled=!(undo&&undo.team===S.active);
 }
 
@@ -323,6 +347,12 @@ $('tabs').addEventListener('click',e=>{
   S.active=b.dataset.team;save();
   if(document.body.classList.contains('editing'))renderRoster();
   render();
+});
+$('score').addEventListener('click',e=>{
+  const b=e.target.closest('.pm button');if(!b)return;
+  const side=b.dataset.side,d=+b.dataset.d;
+  if(d<0&&!score()[side])return;
+  act(()=>{score()[side]+=d;});
 });
 $('list').addEventListener('click',e=>{
   const b=e.target.closest('.tog');if(!b||b.disabled)return;
