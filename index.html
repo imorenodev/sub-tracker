@@ -37,6 +37,7 @@
   }
 }
 *,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
 html,body{margin:0;height:100%}
 body{
   background:var(--bg); color:var(--ink);
@@ -50,43 +51,53 @@ button{cursor:pointer}
 .num{font-variant-numeric:tabular-nums}
 .wrap{max-width:560px;margin:0 auto;padding:0 12px 24px}
 
-/* header */
+/* header: score spans two rows on the left; tabs + roster on top right; stats below them */
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0 8px}
-.topline{display:flex;gap:8px;align-items:center}
-.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;height:50px}
-body.editing .tabs{flex:1}
+.top{display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-template-rows:50px 50px;gap:8px}
+.score{grid-column:1;grid-row:1/3}
+.tabs{grid-column:2;grid-row:1}
+#editBtn{grid-column:3;grid-row:1}
+.st-on{grid-column:2;grid-row:2}
+.st-avg{grid-column:3;grid-row:2}
+body.editing .top{grid-template-rows:50px}
+body.editing .score,body.editing .stat{display:none}
+body.editing .tabs{grid-column:1/3}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
 .tab{border:0;background:transparent;border-radius:10px;padding:0 10px;font-weight:700;font-size:15px;position:relative}
 .tab[aria-selected="true"]{background:var(--pitch);color:#fff}
 .tab .live{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--led-out);display:none}
 .tab.running .live{display:block}
-.score{flex:1;display:flex;align-items:stretch;background:var(--board);color:var(--board-ink);border-radius:14px;height:50px;padding:4px;gap:2px;min-width:0}
-body.editing .score{display:none}
-.sc{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0}
-.sc span{font-size:12px;font-weight:700;letter-spacing:.06em;color:#a9b3ae}
-.pm{display:flex;flex-direction:column;gap:2px;align-self:stretch}
-.pm button{flex:1;width:28px;border:0;border-radius:7px;background:#ffffff1a;color:inherit;font-weight:800;font-size:16px;line-height:1;padding:0}
-.pm button:active{background:#ffffff40}
-.sc b{font-size:24px;line-height:1}
-.sc.us b{color:var(--led-in)}
-.score .dash{align-self:center;color:#a9b3ae;font-weight:700}
-.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:14px;height:50px;padding:0 14px;font-weight:600;font-size:15px}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:0 14px;font-weight:600;font-size:15px}
 
-.controls{display:flex;gap:8px;margin-top:8px;align-items:stretch}
-.stopall{flex:1;border:0;border-radius:14px;background:var(--stop);color:#fff;font-weight:800;font-size:20px;padding:14px 0;letter-spacing:.02em}
-.stopall:disabled{opacity:.35}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 12px;min-width:82px;text-align:center;display:flex;flex-direction:column;justify-content:center}
-.stat b{font-size:20px;line-height:1.1}
+.score{display:flex;align-items:stretch;background:var(--board);color:var(--board-ink);border-radius:14px;padding:6px;gap:2px;min-width:0}
+.sc{flex:1;display:flex;align-items:stretch;justify-content:center;gap:4px;min-width:0}
+.val{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.val span{font-size:12px;font-weight:700;letter-spacing:.06em;color:#a9b3ae}
+.val b{font-size:34px;line-height:1.05}
+.sc.us .val b{color:var(--led-in)}
+.pm{display:flex;flex-direction:column;gap:4px}
+.pm button{flex:1;width:28px;border:0;border-radius:8px;background:#ffffff1a;color:inherit;font-weight:800;font-size:18px;line-height:1;padding:0}
+.pm button:active{background:#ffffff40}
+.score .dash{align-self:center;color:#a9b3ae;font-weight:700}
+
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 10px;min-width:82px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.stat b{font-size:19px;line-height:1.1}
 .stat span{font-size:12px;color:var(--muted)}
 
-/* substitution board */
-.board{margin-top:10px;background:var(--board);color:var(--board-ink);border-radius:16px;padding:12px 14px;display:flex;gap:12px;align-items:center;min-height:64px}
-.board .txt{flex:1;min-width:0}
+/* suggestion board + STOP ALL share a row */
+.boardrow{display:flex;gap:8px;margin-top:10px;align-items:stretch}
+.boardrow>*{flex:1 1 0;min-width:0}
+.stopall{border:0;border-radius:16px;background:var(--stop);color:#fff;font-weight:800;font-size:20px;padding:14px 8px;letter-spacing:.02em}
+.board{background:var(--board);color:var(--board-ink);border-radius:16px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;min-height:64px}
+.board .txt{flex:1 1 120px;min-width:0}
 .board .t{font-size:13px;color:#a9b3ae}
 .board .b{font-size:17px;font-weight:700;margin-top:2px;line-height:1.3}
 .swap{display:flex;flex-direction:column;gap:4px;font-size:18px;font-weight:700}
+.swap>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .swap .out{color:var(--led-out)} .swap .in{color:var(--led-in)}
 .swap .arr{display:inline-block;width:1.2em}
-.board button{border:0;border-radius:12px;background:var(--led-in);color:#062012;font-weight:800;font-size:16px;padding:12px 14px;white-space:nowrap}
+.board button{flex:1 0 auto;border:0;border-radius:12px;background:var(--led-in);color:#062012;font-weight:800;font-size:16px;padding:12px 14px;white-space:nowrap}
 .board.warn button{background:var(--led-out);color:#fff}
 .board.quiet .b{font-weight:600}
 
@@ -140,26 +151,30 @@ h2{font-size:22px;margin:16px 0 8px}
 
 <div class="wrap">
   <header>
-    <div class="topline">
+    <div class="top">
       <div class="score" id="score" aria-label="Score">
-        <div class="sc us"><span>US</span><b class="num" id="scUs">0</b>
-          <div class="pm"><button data-side="us" data-d="1" aria-label="Add a goal for us">+</button><button data-side="us" data-d="-1" aria-label="Remove a goal for us">&minus;</button></div></div>
+        <div class="sc us">
+          <div class="val"><span>US</span><b class="num" id="scUs">0</b></div>
+          <div class="pm"><button data-side="us" data-d="1" aria-label="Add a goal for us">+</button><button data-side="us" data-d="-1" aria-label="Remove a goal for us">&minus;</button></div>
+        </div>
         <span class="dash">&ndash;</span>
-        <div class="sc opp"><div class="pm"><button data-side="opp" data-d="1" aria-label="Add a goal for opponent">+</button><button data-side="opp" data-d="-1" aria-label="Remove a goal for opponent">&minus;</button></div>
-          <b class="num" id="scOpp">0</b><span>OPP</span></div>
+        <div class="sc opp">
+          <div class="pm"><button data-side="opp" data-d="1" aria-label="Add a goal for opponent">+</button><button data-side="opp" data-d="-1" aria-label="Remove a goal for opponent">&minus;</button></div>
+          <div class="val"><span>OPP</span><b class="num" id="scOpp">0</b></div>
+        </div>
       </div>
       <div class="tabs" role="tablist" id="tabs"></div>
       <button class="iconbtn" id="editBtn">Roster</button>
-    </div>
-    <div class="controls" id="gameControls">
-      <button class="stopall" id="stopAll">STOP ALL</button>
-      <div class="stat"><b class="num" id="onCount">0/5</b><span>on field</span></div>
-      <div class="stat"><b class="num" id="avg">0:00</b><span>average</span></div>
+      <div class="stat st-on"><b class="num" id="onCount">0/5</b><span>on field</span></div>
+      <div class="stat st-avg"><b class="num" id="avg">0:00</b><span>average</span></div>
     </div>
   </header>
 
   <main id="game">
-    <div class="board quiet" id="board"></div>
+    <div class="boardrow">
+      <div class="board quiet" id="board"></div>
+      <button class="stopall" id="stopAll" hidden>STOP ALL</button>
+    </div>
     <div class="list" id="list"></div>
     <div class="footer">
       <button id="undoBtn" disabled>Undo last tap</button>
@@ -200,7 +215,7 @@ const uid=()=>Math.random().toString(36).slice(2,9);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function fmt(ms){ms=Math.max(0,Math.round(ms/1000));const m=Math.floor(ms/60),s=ms%60;return m+':'+String(s).padStart(2,'0');}
 
-function freshGame(){return {times:{},lastLineup:[],score:{us:0,opp:0}};}
+function freshGame(){return {times:{},score:{us:0,opp:0}};}
 function defaultTeam(){
   return {players:Array.from({length:10},(_,i)=>({id:uid(),name:'Player '+(i+1),present:true})),
           settings:{onField:5,minStint:180,gap:90},game:freshGame()};
@@ -239,12 +254,9 @@ function suggest(now){
   const anyTime=pres.some(p=>played(p.id,now)>0);
 
   if(!on.length){
-    if(!anyTime){
-      const s=[...bench].sort(least).slice(0,st.onField);
-      return {cls:'',title:'Suggested starters',body:names(s),btn:'Start these',run:n=>s.forEach(p=>startP(p.id,n))};
-    }
-    const lu=t.game.lastLineup.filter(id=>pres.some(p=>p.id===id));
-    if(lu.length)return {cls:'',title:'All timers stopped',body:'Resume with the same '+lu.length+' players?',btn:'Resume',run:n=>lu.forEach(id=>startP(id,n))};
+    // Nobody on the field: suggest the group with the least playing time (starters at kickoff, next group after a stop).
+    const s=[...bench].sort(least).slice(0,st.onField);
+    return {cls:'',title:anyTime?'Start the next suggested group of players?':'Suggested starters',body:names(s),btn:'Start these',run:n=>s.forEach(p=>startP(p.id,n))};
   }
   if(on.length<st.onField&&bench.length){
     const need=st.onField-on.length,ins=[...bench].sort(least).slice(0,need);
@@ -316,7 +328,8 @@ function tick(){
   const onN=pres.filter(p=>isOn(p.id)).length;
   $('avg').textContent=fmt(avg);
   $('onCount').textContent=onN+'/'+st.onField;
-  $('stopAll').disabled=!T().players.some(p=>isOn(p.id));
+  const running=T().players.some(p=>isOn(p.id));
+  if($('stopAll').hidden===running)$('stopAll').hidden=!running;
   document.querySelectorAll('#list .row').forEach(row=>{
     const p=T().players.find(x=>x.id===row.dataset.id);if(!p)return;
     const ms=played(p.id,now),d=ms-avg;
@@ -363,9 +376,7 @@ $('board').addEventListener('click',e=>{
   if(e.target.id==='sugBtn'&&currentSug&&currentSug.run){const r=currentSug.run;act(r);}
 });
 $('stopAll').addEventListener('click',()=>act(n=>{
-  const on=T().players.filter(p=>isOn(p.id)).map(p=>p.id);
-  if(on.length)T().game.lastLineup=on;
-  on.forEach(id=>stopP(id,n));
+  T().players.filter(p=>isOn(p.id)).forEach(p=>stopP(p.id,n));
 }));
 $('undoBtn').addEventListener('click',()=>{
   if(!undo||undo.team!==S.active)return;
@@ -393,7 +404,6 @@ function renderRoster(){
 $('editBtn').addEventListener('click',()=>{
   const ed=document.body.classList.toggle('editing');
   $('editBtn').textContent=ed?'Game':'Roster';
-  $('gameControls').style.display=ed?'none':'';
   if(ed)renderRoster();else render();
 });
 $('doneBtn').addEventListener('click',()=>$('editBtn').click());
