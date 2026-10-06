@@ -51,37 +51,36 @@ button{cursor:pointer}
 .num{font-variant-numeric:tabular-nums}
 .wrap{max-width:560px;margin:0 auto;padding:0 12px 24px}
 
-/* header: score spans two rows on the left; tabs + roster on top right; stats below them */
+/* header: team tabs + roster on top; score spans two rows on the left with stats stacked beside it */
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0 8px}
-.top{display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-template-rows:50px 50px;gap:8px}
-.score{grid-column:1;grid-row:1/3}
-.tabs{grid-column:2;grid-row:1}
-#editBtn{grid-column:3;grid-row:1}
+.top{display:grid;grid-template-columns:minmax(0,1fr) 96px;grid-template-rows:46px 50px 50px;gap:8px}
+.tabs{grid-column:1;grid-row:1}
+#editBtn{grid-column:2;grid-row:1}
+.score{grid-column:1;grid-row:2/4}
 .st-on{grid-column:2;grid-row:2}
-.st-avg{grid-column:3;grid-row:2}
-body.editing .top{grid-template-rows:50px}
+.st-avg{grid-column:2;grid-row:3}
+body.editing .top{grid-template-rows:46px}
 body.editing .score,body.editing .stat{display:none}
-body.editing .tabs{grid-column:1/3}
 
-.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
-.tab{border:0;background:transparent;border-radius:10px;padding:0 10px;font-weight:700;font-size:15px;position:relative}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.tab{border:0;background:transparent;border-radius:10px;padding:0 10px;font-weight:700;font-size:15px;position:relative;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tab[aria-selected="true"]{background:var(--pitch);color:#fff}
 .tab .live{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--led-out);display:none}
 .tab.running .live{display:block}
-.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:0 14px;font-weight:600;font-size:15px}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:0 8px;font-weight:600;font-size:15px}
 
 .score{display:flex;align-items:stretch;background:var(--board);color:var(--board-ink);border-radius:14px;padding:6px;gap:2px;min-width:0}
-.sc{flex:1;display:flex;align-items:stretch;justify-content:center;gap:4px;min-width:0}
+.sc{flex:1;display:flex;align-items:stretch;justify-content:center;gap:10px;min-width:0}
 .val{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
 .val span{font-size:12px;font-weight:700;letter-spacing:.06em;color:#a9b3ae}
-.val b{font-size:34px;line-height:1.05}
+.val b{font-size:40px;line-height:1.05}
 .sc.us .val b{color:var(--led-in)}
 .pm{display:flex;flex-direction:column;gap:4px}
-.pm button{flex:1;width:28px;border:0;border-radius:8px;background:#ffffff1a;color:inherit;font-weight:800;font-size:18px;line-height:1;padding:0}
+.pm button{flex:1;width:36px;border:0;border-radius:8px;background:#ffffff1a;color:inherit;font-weight:800;font-size:18px;line-height:1;padding:0}
 .pm button:active{background:#ffffff40}
 .score .dash{align-self:center;color:#a9b3ae;font-weight:700}
 
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 10px;min-width:82px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 6px;text-align:center;display:flex;flex-direction:column;justify-content:center}
 .stat b{font-size:19px;line-height:1.1}
 .stat span{font-size:12px;color:var(--muted)}
 
@@ -111,7 +110,9 @@ body.editing .tabs{grid-column:1/3}
 .name{font-size:18px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .meta{font-size:13px;margin-top:2px;color:var(--even);font-weight:600}
 .row.under .meta{color:var(--under)} .row.over .meta{color:var(--over)}
-.time{font-size:22px;font-weight:700;text-align:right}
+.tcell{text-align:right}
+.time{font-size:22px;font-weight:700}
+.shifts{font-size:12px;font-weight:600;color:var(--muted);margin-top:1px}
 .row.on .time{color:var(--pitch)}
 .tog{border:0;border-radius:12px;height:50px;font-weight:800;font-size:17px;background:var(--go);color:#fff}
 .row.on .tog{background:var(--stop)}
@@ -143,6 +144,7 @@ h2{font-size:22px;margin:16px 0 8px}
 .setting{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px}
 .setting label{font-weight:600}
 .setting small{display:block;color:var(--muted);font-weight:400;font-size:13px}
+.setting input[type=text]{width:9.5em;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px;font-size:16px}
 .setting select{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px;font-size:16px}
 .primary{width:100%;border:0;border-radius:14px;background:var(--pitch);color:#fff;font-weight:800;font-size:18px;padding:16px 0;margin-top:14px}
 </style>
@@ -184,6 +186,11 @@ h2{font-size:22px;margin:16px 0 8px}
   </main>
 
   <section id="roster">
+    <h2>Team</h2>
+    <div class="setting">
+      <label for="tName">Team name<small>Shown on the tab</small></label>
+      <input type="text" id="tName" maxlength="12" autocomplete="off" autocapitalize="words">
+    </div>
     <h2 id="rosterTitle">Roster</h2>
     <div id="edList"></div>
     <div class="btnrow">
@@ -229,13 +236,14 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 save();
 
 const T=()=>S.teams[S.active];
+const tname=k=>(S.teams[k||S.active].name||k||S.active);
 const present=()=>T().players.filter(p=>p.present);
-function rec(id,team){const g=(team||T()).game;if(!g.times[id])g.times[id]={total:0,startedAt:null,benchSince:null};return g.times[id];}
+function rec(id,team){const g=(team||T()).game;if(!g.times[id])g.times[id]={total:0,startedAt:null,benchSince:null,shifts:0};return g.times[id];}
 function played(id,now){const r=rec(id);return r.total+(r.startedAt?now-r.startedAt:0);}
 const isOn=id=>!!rec(id).startedAt;
 const score=()=>T().game.score||(T().game.score={us:0,opp:0});
 function startP(id,now){const r=rec(id);if(!r.startedAt){r.startedAt=now;r.benchSince=null;}}
-function stopP(id,now){const r=rec(id);if(r.startedAt){r.total+=now-r.startedAt;r.startedAt=null;r.benchSince=now;}}
+function stopP(id,now){const r=rec(id);if(r.startedAt){r.total+=now-r.startedAt;r.startedAt=null;r.benchSince=now;r.shifts=(r.shifts||0)+1;}}
 
 let undo=null;
 function act(fn){
@@ -302,7 +310,7 @@ function renderBoard(now){
 function renderTabs(){
   $('tabs').innerHTML=TEAMS.map(t=>{
     const running=S.teams[t].players.some(p=>(S.teams[t].game.times[p.id]||{}).startedAt);
-    return `<button class="tab${running?' running':''}" role="tab" aria-selected="${t===S.active}" data-team="${t}">${t}<span class="live"></span></button>`;
+    return `<button class="tab${running?' running':''}" role="tab" aria-selected="${t===S.active}" data-team="${t}">${esc(tname(t))}<span class="live"></span></button>`;
   }).join('');
 }
 
@@ -316,7 +324,7 @@ function renderList(){
     const on=p.present&&isOn(p.id);
     return `<div class="row${on?' on':''}${p.present?'':' absent'}" data-id="${p.id}">
       <div><div class="name">${on?'<span class="pip"></span>':''}${esc(p.name)}</div><div class="meta"></div></div>
-      <div class="time num"></div>
+      <div class="tcell"><div class="time num"></div><div class="shifts">${rec(p.id).shifts||0}× on field</div></div>
       <button class="tog"${p.present?'':' disabled'}>${!p.present?'Not here':on?'STOP':'START'}</button>
     </div>`;
   }).join('');
@@ -383,7 +391,7 @@ $('undoBtn').addEventListener('click',()=>{
   T().game=JSON.parse(undo.game);undo=null;save();render();
 });
 $('newGame').addEventListener('click',()=>{
-  if(!confirm('Start a new '+S.active+' game? This clears today\u2019s playing times. Your roster stays.'))return;
+  if(!confirm('Start a new '+tname()+' game? This clears today\u2019s playing times. Your roster stays.'))return;
   undo={team:S.active,game:JSON.stringify(T().game)};
   T().game=freshGame();save();render();
 });
@@ -392,7 +400,8 @@ $('newGame').addEventListener('click',()=>{
 function opts(sel,items,val){sel.innerHTML=items.map(([v,l])=>`<option value="${v}"${v==val?' selected':''}>${l}</option>`).join('');}
 function renderRoster(){
   const t=T();
-  $('rosterTitle').textContent=S.active+' roster';
+  $('rosterTitle').textContent=tname()+' roster';
+  $('tName').value=tname();
   $('edList').innerHTML=t.players.map(p=>`<div class="ed" data-id="${p.id}">
     <input type="text" value="${esc(p.name)}" aria-label="Player name" autocomplete="off" autocapitalize="words">
     <label class="here"><input type="checkbox"${p.present?' checked':''}>Here</label>
@@ -423,7 +432,7 @@ $('edList').addEventListener('change',e=>{
 $('edList').addEventListener('click',e=>{
   const b=e.target.closest('.del');if(!b)return;
   const id=b.closest('.ed').dataset.id,t=T(),p=t.players.find(x=>x.id===id);
-  if(!confirm('Remove '+p.name+' from the '+S.active+' roster?'))return;
+  if(!confirm('Remove '+p.name+' from the '+tname()+' roster?'))return;
   t.players=t.players.filter(x=>x.id!==id);delete t.game.times[id];save();renderRoster();
 });
 $('addP').addEventListener('click',()=>{
@@ -432,6 +441,11 @@ $('addP').addEventListener('click',()=>{
   const inputs=$('edList').querySelectorAll('input[type=text]');const last=inputs[inputs.length-1];
   last.focus();last.select();
 });
+$('tName').addEventListener('input',e=>{
+  T().name=e.target.value.trim()||undefined;save();renderTabs();
+  $('rosterTitle').textContent=tname()+' roster';
+});
+$('tName').addEventListener('blur',e=>{e.target.value=tname();});
 $('allHere').addEventListener('click',()=>{T().players.forEach(p=>p.present=true);save();renderRoster();});
 [['sOn','onField'],['sStint','minStint'],['sGap','gap']].forEach(([id,k])=>{
   $(id).addEventListener('change',e=>{T().settings[k]=+e.target.value;save();});
